@@ -1,0 +1,23 @@
+package br.com.equipamentos.emprestimos.msemprestimo.repository;
+
+import br.com.equipamentos.emprestimos.msemprestimo.model.Emprestimo;
+import br.com.equipamentos.emprestimos.msemprestimo.model.StatusEmprestimo;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+import java.util.UUID;
+
+public interface EmprestimoRepository extends JpaRepository<Emprestimo, UUID> {
+
+    List<Emprestimo> findByUsuarioIdOrderByDataEmprestimoDesc(UUID usuarioId);
+
+    boolean existsByEquipamentoIdAndStatus(
+            UUID equipamentoId,
+            StatusEmprestimo status
+    );
+
+    List<Emprestimo> findByEquipamentoIdAndStatus(
+            UUID equipamentoId,
+            StatusEmprestimo status
+    );
+}
