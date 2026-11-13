@@ -1,4 +1,14 @@
+
 package br.com.equipamentos.emprestimos.msequipamento.dto;
 
-public class EquipamentoResponseDTO {
-}
+import java.util.UUID;
+
+public record EquipamentoResponseDTO(
+
+        UUID id,
+        String nome,
+        String tipo,
+        String patrimonio,
+        Boolean disponivel
+
+) {}

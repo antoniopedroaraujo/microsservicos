@@ -1,7 +1,11 @@
+
 package br.com.equipamentos.emprestimos.msequipamento.exception;
 
-public class ApiError extends RuntimeException {
-  public ApiError(String message) {
-    super(message);
-  }
-}
+import java.time.LocalDateTime;
+
+public record ApiError(
+        int status,
+        String erro,
+        String mensagem,
+        LocalDateTime dataHora
+) {}
