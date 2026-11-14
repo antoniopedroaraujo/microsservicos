@@ -2,6 +2,7 @@ package br.com.equipamentos.emprestimos.msemprestimo.controller;
 
 import br.com.equipamentos.emprestimos.msemprestimo.dto.EmprestimoRequestDTO;
 import br.com.equipamentos.emprestimos.msemprestimo.dto.EmprestimoResponseDTO;
+import br.com.equipamentos.emprestimos.msemprestimo.dto.DevolucaoRequestDTO;
 import br.com.equipamentos.emprestimos.msemprestimo.service.EmprestimoService;
 
 import jakarta.validation.Valid;
@@ -45,10 +46,11 @@ public class EmprestimoController {
         return ResponseEntity.ok(service.listarPorUsuario(usuarioId));
     }
 
-    @PatchMapping("/{id}/devolucao")
+    @PutMapping("/{id}/devolucao")
     public ResponseEntity<EmprestimoResponseDTO> devolver(
-            @PathVariable UUID id
+            @PathVariable UUID id,
+            @Valid @RequestBody DevolucaoRequestDTO dto
     ) {
-        return ResponseEntity.ok(service.devolver(id));
+        return ResponseEntity.ok(service.devolver(id, dto));
     }
 }

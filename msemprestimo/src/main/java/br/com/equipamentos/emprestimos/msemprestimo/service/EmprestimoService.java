@@ -2,6 +2,7 @@ package br.com.equipamentos.emprestimos.msemprestimo.service;
 
 import br.com.equipamentos.emprestimos.msemprestimo.dto.EmprestimoRequestDTO;
 import br.com.equipamentos.emprestimos.msemprestimo.dto.EmprestimoResponseDTO;
+import br.com.equipamentos.emprestimos.msemprestimo.dto.DevolucaoRequestDTO;
 
 import java.util.List;
 import java.util.UUID;
@@ -14,5 +15,5 @@ public interface EmprestimoService {
 
     List<EmprestimoResponseDTO> listarPorUsuario(UUID usuarioId);
 
-    EmprestimoResponseDTO devolver(UUID id);
+    EmprestimoResponseDTO devolver(UUID id, DevolucaoRequestDTO dto);
 }

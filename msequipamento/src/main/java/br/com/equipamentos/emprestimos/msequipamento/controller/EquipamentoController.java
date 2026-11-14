@@ -3,6 +3,7 @@ package br.com.equipamentos.emprestimos.msequipamento.controller;
 
 import br.com.equipamentos.emprestimos.msequipamento.dto.EquipamentoRequestDTO;
 import br.com.equipamentos.emprestimos.msequipamento.dto.EquipamentoResponseDTO;
+import br.com.equipamentos.emprestimos.msequipamento.dto.CondicaoEquipamentoRequestDTO;
 import br.com.equipamentos.emprestimos.msequipamento.service.EquipamentoService;
 
 import jakarta.validation.Valid;
@@ -40,6 +41,14 @@ public class EquipamentoController {
             @PathVariable UUID id) {
 
         return ResponseEntity.ok(service.buscarPorId(id));
+    }
+
+    // Alterar a condição física do equipamento
+    @PutMapping("/{id}/condicao")
+    public ResponseEntity<EquipamentoResponseDTO> alterarCondicao(
+            @PathVariable UUID id,
+            @Valid @RequestBody CondicaoEquipamentoRequestDTO dto) {
+        return ResponseEntity.ok(service.alterarCondicao(id, dto));
     }
 
     // Listar equipamentos disponíveis

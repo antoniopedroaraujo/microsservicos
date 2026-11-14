@@ -1,9 +1,11 @@
 package br.com.equipamentos.emprestimos.msemprestimo.service.impl;
 
 import br.com.equipamentos.emprestimos.msemprestimo.client.EquipamentoClient;
+import br.com.equipamentos.emprestimos.msemprestimo.client.EquipamentoIntegracaoService;
 import br.com.equipamentos.emprestimos.msemprestimo.client.UsuarioClient;
 import br.com.equipamentos.emprestimos.msemprestimo.dto.EmprestimoRequestDTO;
 import br.com.equipamentos.emprestimos.msemprestimo.dto.EmprestimoResponseDTO;
+import br.com.equipamentos.emprestimos.msemprestimo.dto.DevolucaoRequestDTO;
 import br.com.equipamentos.emprestimos.msemprestimo.exception.EmprestimoConflictException;
 import br.com.equipamentos.emprestimos.msemprestimo.exception.EmprestimoNotFoundException;
 import br.com.equipamentos.emprestimos.msemprestimo.exception.RecursoNaoEncontradoException;
@@ -27,15 +29,18 @@ public class EmprestimoServiceImpl implements EmprestimoService {
     private final EmprestimoRepository repository;
     private final UsuarioClient usuarioClient;
     private final EquipamentoClient equipamentoClient;
+    private final EquipamentoIntegracaoService equipamentoIntegracaoService;
 
     public EmprestimoServiceImpl(
             EmprestimoRepository repository,
             UsuarioClient usuarioClient,
-            EquipamentoClient equipamentoClient
+            EquipamentoClient equipamentoClient,
+            EquipamentoIntegracaoService equipamentoIntegracaoService
     ) {
         this.repository = repository;
         this.usuarioClient = usuarioClient;
         this.equipamentoClient = equipamentoClient;
+        this.equipamentoIntegracaoService = equipamentoIntegracaoService;
     }
 
     @Override
@@ -129,7 +134,7 @@ public class EmprestimoServiceImpl implements EmprestimoService {
 
     @Override
     @Transactional
-    public EmprestimoResponseDTO devolver(UUID id) {
+    public EmprestimoResponseDTO devolver(UUID id, DevolucaoRequestDTO dto) {
 
         Emprestimo emprestimo = repository.findById(id)
                 .orElseThrow(EmprestimoNotFoundException::new);
@@ -140,30 +145,24 @@ public class EmprestimoServiceImpl implements EmprestimoService {
             );
         }
 
-        // Liberar o equipamento no microsserviço correspondente
+        // A condição deve ser atualizada antes de liberar a reserva ou concluir a devolução.
+        equipamentoIntegracaoService.alterarCondicao(emprestimo.getEquipamentoId(), dto);
+
+        // Preserva a liberação da reserva já existente na primeira etapa.
         try {
-            equipamentoClient.liberar(
-                    emprestimo.getEquipamentoId(),
-                    emprestimo.getId()
-            );
+            equipamentoClient.liberar(emprestimo.getEquipamentoId(), emprestimo.getId());
         } catch (FeignException.NotFound e) {
-            throw new RecursoNaoEncontradoException(
-                    "Equipamento não encontrado"
-            );
+            throw new RecursoNaoEncontradoException("Equipamento não encontrado");
         } catch (FeignException.Conflict e) {
-            throw new EmprestimoConflictException(
-                    "Não foi possível liberar o equipamento"
-            );
+            throw new EmprestimoConflictException("Não foi possível liberar o equipamento");
         } catch (FeignException e) {
             throw new ServicoIndisponivelException(
                     "Não foi possível comunicar com o serviço de equipamentos"
             );
         }
 
-        // Atualizar o empréstimo
         emprestimo.setDataDevolucao(LocalDateTime.now());
         emprestimo.setStatus(StatusEmprestimo.DEVOLVIDO);
-
         return converterParaDTO(repository.save(emprestimo));
     }
 

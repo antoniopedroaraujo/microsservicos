@@ -325,3 +325,25 @@ PATCH http://localhost:8080/api/v1/emprestimos/33333333-3333-3333-3333-333333333
 
 A devolução deve solicitar a liberação do equipamento e atualizar o status do empréstimo para `DEVOLVIDO`, sem executar a liberação duas vezes.
 
+
+
+## Etapa 2 — condição do equipamento, OpenFeign e Circuit Breaker
+
+- `PUT /api/v1/equipamentos/{id}/condicao` recebe `{ "condicao": "BOM" }` ou `{ "condicao": "AVARIADO" }`.
+- `PUT /api/v1/emprestimos/{id}/devolucao` agora recebe o mesmo corpo JSON.
+- A devolução atualiza a condição via OpenFeign antes de liberar a reserva e marcar o empréstimo como `DEVOLVIDO`.
+- A nova chamada é protegida pelo Circuit Breaker Resilience4j (`equipamentoCondicao`); indisponibilidade retorna HTTP 503 e equipamento inexistente permanece HTTP 404.
+- Equipamentos existentes recebem `BOM` por padrão pela migração Flyway V2.
+
+Exemplo de devolução:
+
+```http
+PUT /api/v1/emprestimos/{id}/devolucao
+Content-Type: application/json
+```
+
+```json
+{
+  "condicao": "AVARIADO"
+}
+```

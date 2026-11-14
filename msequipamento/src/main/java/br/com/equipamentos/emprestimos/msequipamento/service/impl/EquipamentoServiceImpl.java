@@ -3,10 +3,12 @@ package br.com.equipamentos.emprestimos.msequipamento.service.impl;
 
 import br.com.equipamentos.emprestimos.msequipamento.dto.EquipamentoRequestDTO;
 import br.com.equipamentos.emprestimos.msequipamento.dto.EquipamentoResponseDTO;
+import br.com.equipamentos.emprestimos.msequipamento.dto.CondicaoEquipamentoRequestDTO;
 import br.com.equipamentos.emprestimos.msequipamento.exception.EquipamentoNotFoundException;
 import br.com.equipamentos.emprestimos.msequipamento.exception.EquipamentoConflictException;
 import br.com.equipamentos.emprestimos.msequipamento.exception.EquipamentoIndisponivelException;
 import br.com.equipamentos.emprestimos.msequipamento.model.Equipamento;
+import br.com.equipamentos.emprestimos.msequipamento.model.CondicaoEquipamento;
 import br.com.equipamentos.emprestimos.msequipamento.repository.EquipamentoRepository;
 import br.com.equipamentos.emprestimos.msequipamento.service.EquipamentoService;
 
@@ -42,6 +44,7 @@ public class EquipamentoServiceImpl implements EquipamentoService {
         equipamento.setTipo(dto.tipo());
         equipamento.setPatrimonio(dto.patrimonio());
         equipamento.setDisponivel(dto.disponivel());
+        equipamento.setCondicao(dto.condicao() != null ? dto.condicao() : CondicaoEquipamento.BOM);
 
         Equipamento salvo = repository.save(equipamento);
 
@@ -55,6 +58,16 @@ public class EquipamentoServiceImpl implements EquipamentoService {
                 .orElseThrow(EquipamentoNotFoundException::new);
 
         return converterParaDTO(equipamento);
+    }
+
+    @Override
+    @Transactional
+    public EquipamentoResponseDTO alterarCondicao(UUID id, CondicaoEquipamentoRequestDTO dto) {
+        Equipamento equipamento = repository.findById(id)
+                .orElseThrow(EquipamentoNotFoundException::new);
+
+        equipamento.setCondicao(dto.condicao());
+        return converterParaDTO(repository.save(equipamento));
     }
 
     @Override
@@ -132,7 +145,8 @@ public class EquipamentoServiceImpl implements EquipamentoService {
                 equipamento.getNome(),
                 equipamento.getTipo(),
                 equipamento.getPatrimonio(),
-                equipamento.getDisponivel()
+                equipamento.getDisponivel(),
+                equipamento.getCondicao()
         );
     }
 }

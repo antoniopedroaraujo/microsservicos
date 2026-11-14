@@ -33,3 +33,24 @@ eureka:
 
   instance:
     prefer-ip-address: true
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      equipamentoCondicao:
+        slidingWindowSize: 5
+        minimumNumberOfCalls: 3
+        failureRateThreshold: 50
+        waitDurationInOpenState: 30s
+        permittedNumberOfCallsInHalfOpenState: 2
+        ignoreExceptions:
+          - br.com.equipamentos.emprestimos.msemprestimo.exception.RecursoNaoEncontradoException
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,circuitbreakers,circuitbreakerevents
+  endpoint:
+    health:
+      show-details: always

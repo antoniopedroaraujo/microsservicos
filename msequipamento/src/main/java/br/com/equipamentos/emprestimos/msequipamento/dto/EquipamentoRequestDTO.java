@@ -1,6 +1,6 @@
-
 package br.com.equipamentos.emprestimos.msequipamento.dto;
 
+import br.com.equipamentos.emprestimos.msequipamento.model.CondicaoEquipamento;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -20,6 +20,8 @@ public record EquipamentoRequestDTO(
         String patrimonio,
 
         @NotNull(message = "A disponibilidade é obrigatória")
-        Boolean disponivel
+        Boolean disponivel,
+
+        CondicaoEquipamento condicao
 
 ) {}

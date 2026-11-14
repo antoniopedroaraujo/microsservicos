@@ -1,6 +1,6 @@
-
 package br.com.equipamentos.emprestimos.msequipamento.dto;
 
+import br.com.equipamentos.emprestimos.msequipamento.model.CondicaoEquipamento;
 import java.util.UUID;
 
 public record EquipamentoResponseDTO(
@@ -9,6 +9,7 @@ public record EquipamentoResponseDTO(
         String nome,
         String tipo,
         String patrimonio,
-        Boolean disponivel
+        Boolean disponivel,
+        CondicaoEquipamento condicao
 
 ) {}

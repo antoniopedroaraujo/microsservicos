@@ -42,4 +42,8 @@ public class Equipamento {
 
     @Column(name = "reserva_emprestimo_id")
     private UUID reservaEmprestimoId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 10)
+    private CondicaoEquipamento condicao = CondicaoEquipamento.BOM;
 }
